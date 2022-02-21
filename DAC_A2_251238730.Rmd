@@ -1,0 +1,89 @@
+---
+title: "Data Analytics Consulting Assignment 2"
+author: "Unnikrishnan Sivakumaran Nair"
+date: "17/02/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Analysis of the mercury levels in Maine
+
+```{r}
+HgData_maine<-read.csv('Assignment2_2022_Data.txt', sep=" ", header = FALSE)
+colnames(HgData_maine)<-c("NAME","HG","N","ELV","SA","Z","LT","ST","DA","RF","FR","DAM","LAT1","LAT2","LAT3","LONG1","LONG2","LONG3")
+HgData_maine
+```
+
+## Test of hypothesis to test statistical significance of Hg levels in Maine
+
+H0: The Hg levels in Maine <= 0.43
+H1: The Hg levels in Maine > 0.43
+
+```{r}
+t.test(HgData_maine$HG,mu=0.43,alternative = "greater")
+```
+
+From the analysis there is not enough statistical evidence to claim that the mean Hg levels in Maine is greater than 0.43
+
+
+## Test of hypothesis to test statistical significance of Hg levels in Maine
+
+H0: The Hg levels in Maine <= 0.5
+H1: The Hg levels in Maine > 0.5
+
+```{r}
+t.test(HgData_maine$HG,mu=0.5,alternative = "greater")
+```
+
+H0: The Hg levels in Maine <= 1
+H1: The Hg levels in Maine > 1
+
+```{r}
+t.test(HgData_maine$HG,mu=1,alternative = "greater")
+```
+
+
+From the p-value it can be inferred that the mercury levels in Maine is not as high as .5 which is the normal Hg range accepted in most of the other states in the US.
+
+
+## Checking if the presence of Dams have an influence on the Hg levels.
+
+
+
+```{r}
+model<-lm(HG~DAM+ELV, data=HgData_maine)
+summary(model)
+```
+```{r}
+HG_dam<-HgData_maine[HgData_maine$DAM==1,]
+HG_nodam<-HgData_maine[HgData_maine$DAM==0,]
+```
+
+
+```{r}
+
+var.test(HG_dam$HG, HG_nodam$HG)
+```
+
+```{r}
+t.test(HG_dam$HG,HG_nodam$HG,var.equal=TRUE)
+```
+
+## Checking if the lake type have an influence on the Hg levels.
+
+
+```{r}
+HG_Eutrophic<-HgData_maine[HgData_maine$LT==2,]
+HG_OtherLT<-HgData_maine[HgData_maine$LT!=0,]
+```
+
+
+```{r}
+var.test(HG_Eutrophic$HG, HG_OtherLT$HG)
+```
+```{r}
+t.test(HG_Eutrophic$HG,HG_OtherLT$HG,alternative = "greater",var.equal=FALSE)
+```
